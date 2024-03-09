@@ -1,0 +1,277 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <script src="../js/AjaxCalls.js"></script>
+    <link rel="stylesheet" href="../css/StyleSheet2.css">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+
+    <style>
+        #DivVac {
+            border: 1px solid black;
+            width: 40%;
+            padding: 10px;
+            margin: 20px;
+            text-align: center;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+    <script>
+        const UsersApi = location.hostname === "localhost" || location.hostname === "127.0.0.1" ?
+            "https://localhost:7244/api/Users" :
+            `https://proj.ruppin.ac.il/cgroup67/test2/tar1/api/Users`;
+
+
+        const VacApi = location.hostname === "localhost" || location.hostname === "127.0.0.1" ?
+            "https://localhost:7244/api/Vacations" :
+            `https://proj.ruppin.ac.il/cgroup67/test2/tar1/api/Vacations`;
+
+
+        $(document).ready(function () {
+            //let port = 7244;
+            //server = `https://localhost:${port}/`;
+
+
+          /*  api = server + "api/Vacations";*/
+            FlatID = Number(sessionStorage.getItem("FlatID"));
+            console.log(`${FlatID}`);
+            $("#VacForm").submit(ValidForm);
+            $("#RenderVacation").on("click", GetVac);
+
+
+            const startDate = $('#startDateTB');
+            const endDate = $('#endDateTB');
+            const Today = new Date;
+            var year = Today.getFullYear();
+            var month = Today.getMonth() + 1; // Months are zero-indexed, so add 1
+            var day = Today.getDate() + 1; //to get today date
+            // Create a variable with today's date
+            const todayDate = new Date(year, month - 1, day);
+            startDate.on('focus', function () {
+                startDate.attr('min', todayDate.toISOString().split('T')[0]);//set the min start date to be today
+            });
+            // Event listener that sets the minimum of the End Date to be bigger than the Start Date
+            startDate.on('input', function () {
+                // Set the End Date Min
+                endDate.attr('min', startDate.val());
+            });
+
+            $("#endDateTB").on("change", CheckDates);
+
+
+            document.getElementById("UpdateUserForm").style.display = "none";
+            $("#ULForm").submit(ValidForm2);
+
+
+
+        });
+
+        function GetVac() {
+
+            ajaxCall("GET", VacApi, "", getSCB, getECB);
+        }
+
+        // success callback function
+        function getSCB(VacationsList) {
+            console.log(VacationsList);
+            str = "";
+
+            for (var i = 0; i < VacationsList.length; i++) {
+                str += `<div id="DivVac"><p>Vacation Id is: ${VacationsList[i].vacationId}</p><p>Flat ID is: ${VacationsList[i].flatId}</p><p>User Id is: ${VacationsList[i].userId}</p></p><p>start Date is: ${VacationsList[i].startDate}</p></p><p>End Date is: ${VacationsList[i].endDate}</p></div>`;
+
+            }
+            document.getElementById("ph").innerHTML = str;
+
+        }
+
+        // error callback function
+        function getECB(errorFromServer) {
+            console.log(errorFromServer);
+        }
+
+        function ValidForm() {
+            submitVac();
+            return false; // the return false will prevent the form from being submitted
+        }
+
+        function CheckDates() {
+            let StartD_Val = new Date($("#startDateTB").val());
+            let EndD_Val = new Date($("#endDateTB").val());
+            let TotalTime = EndD_Val.getTime() - StartD_Val.getTime(); //set the total time between the startDate to the EndDate
+            let TotalDays = TotalTime / (3600 * 1000 * 24); //Number of second in 1 day
+            if (TotalDays > 20) {
+                //alert('The Vacation cannot exceed 20 days');
+                swal("Error!", "The Vacation cannot exceed 20 days", "error");
+                $("#endDateTB").val("");
+                return;
+            }
+        }
+
+
+
+        function submitVac() {
+            let v = {
+             /*   VacationId: $("#vacationIdTB").val(),*/
+                flatId: FlatID,
+                userId: sessionStorage.getItem("UserLogin"),
+                startDate: new Date($("#startDateTB").val()),
+                endDate: new Date($("#endDateTB").val())
+            };
+
+         
+
+            ajaxCall("POST", VacApi, JSON.stringify(v), postSCB, postECB);
+
+
+        }
+
+        // success callback function
+        function postSCB(objectFromServer) {
+
+            if (objectFromServer) {
+                swal("Submitted to the server!", "Great Job", "success");
+            }
+            else {
+                swal("Error!", "The Order Id is already take/The Vacation Dates are already booked", "error");
+            }
+
+            console.log(objectFromServer);
+
+        }
+
+        // error callback function
+        function postECB(errorFromServer) {
+            console.log(errorFromServer);
+        }
+
+
+        function ValidForm2() {
+            return false;
+        }
+
+        function UpdateDetails() {
+            document.getElementById("UpdateUserForm").style.display = "";
+            document.getElementById("VacForm").style.display = "none";
+            /*document.getElementById("ph").style.display = "none";*/
+            $("#UpdateUserForm").submit(UpdatenNow);
+            return false;
+        }
+
+        function UpdatenNow() {
+            let u = {
+                firstName: $("#FirstNameTB").val(),
+                lastName: $("#LastNameTB").val(),
+                email: sessionStorage.getItem("UserLogin"),
+                password: $("#PasswordTB").val(),
+                isAdmin: false,
+                isActive: true,
+
+            };
+
+          /*  api = server + "api/Users";*/
+
+            ajaxCall("PUT", UsersApi, JSON.stringify(u), putSCB, putECB);
+            return false;
+
+        }
+
+        // success callback function
+        function putSCB(objectFromServer) {
+            console.log(objectFromServer);
+            document.getElementById("UpdateUserForm").style.display = "none";
+            document.getElementById("VacForm").style.display = "";
+        }
+        // error callback function
+        function putECB(errorFromServer) {
+            console.log(errorFromServer);
+        }
+
+        function Logout() {
+            sessionStorage.removeItem("UserLogin");
+            window.location.href = 'User.html';
+            return false;
+        }
+
+
+
+
+
+    </script>
+
+
+</head>
+<body>
+  
+    <div>
+        <div>
+            <form id="ULForm">
+
+                <input id="UpdateBTN" type="submit" onclick="UpdateDetails()" value="Update details" />
+                <input id="LogoutBTN" type="submit" onclick="Logout()" value="Logout" />
+
+            </form>
+        </div>
+        <div>
+            <form id="UpdateUserForm">
+                <h2>Update your details:</h2>
+
+                <div class="form-group">
+                    <label for="FirstNameTB"><span class="red-star"></span>First Name:</label>
+                    <input type="text" class="form-control" id="FirstNameTB" placeholder="Enter First Name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="LastNameTB"><span class="red-star"></span>Last Name:</label>
+                    <input type="text" class="form-control" id="LastNameTB" placeholder="Enter Last Name" required />
+                </div>
+               
+                <div class="form-group">
+                    <label for="PasswordTB"><span class="red-star"></span>Password:</label>
+                    <input type="text" class="form-control" id="PasswordTB" placeholder="Enter Password" required />
+                </div>
+
+                <input id="UpdateNOWBTN" type="submit" value="Update" />
+
+            </form>
+
+        </div>
+
+        <form id="VacForm">
+            <h2>Insert A new Vacation</h2>
+          
+            <div class="form-group">
+                <label for="FlatIdTB"><span class="red-star"></span>Flat ID:</label>
+                <input type="number" class="form-control" id="FlatIdTB" disabled>
+            </div>
+            <div class="form-group">
+                <label for="startDateTB"><span class="red-star"></span>Start Date:</label>
+                <input type="date" class="form-control" id="startDateTB" required />
+            </div>
+            <div class="form-group">
+                <label for="endDateTB"><span class="red-star"></span>End Date:</label>
+                <input type="date" class="form-control" id="endDateTB" required />
+            </div>
+
+            <input id="submitBTN" type="submit" value="Submit Vacation" />
+            <input id="RenderVacation" type="button" value="Get Vacations" />
+        </form>
+
+
+
+    </div>
+  
+    <div id="ph">
+
+    </div>
+</body>
+</html>

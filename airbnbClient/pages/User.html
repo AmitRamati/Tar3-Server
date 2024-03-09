@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+
+    <script src="../js/AjaxCalls.js"></script>
+    <link rel="stylesheet" href="../css/UserStyle.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <script>
+        $(document).ready(function () {
+            //if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+            //    let port = "7244";
+            //    server = 'https://localhost:' + port;
+
+            //}
+            //else {
+            //   server = "https://proj.ruppin.ac.il/cgroup67/test2/tar1/";
+            //}
+
+
+
+            let port = 7244;
+            server = `https://localhost:${port}/`;
+
+            var UsersListGlobal = [];
+
+            $("#UserForm").submit(ValidForm);
+            document.getElementById("UserLogin").style.display = "none";
+            GetUsers();
+
+
+        });
+
+
+
+        function GetUsers() {
+            api = server + "api/Users";
+            ajaxCall("GET", api, "", getSCB, getECB);
+        }
+        // success callback function
+        function getSCB(UsersList) {
+            console.log(UsersList);
+            UsersListGlobal = UsersList;
+
+
+        }
+        // error callback function
+        function getECB(errorFromServer) {
+            console.log(errorFromServer);
+
+        }
+
+        function ValidForm() {
+            RegiUser();
+            return false; // the return false will prevent the form from being submitted
+        }
+
+        function GoToLogin() {
+            document.getElementById("UserLogin").style.display = "";
+            document.getElementById("UserForm").style.display = "none";
+            $("#UserLogin").submit(GoToFlats);
+            return false;
+        }
+
+
+
+        function GoToFlats() {
+            userEmail = $("#LIEmailTB").val();
+            userPass = $("#LIPasswordTB").val();
+
+            for (var i = 0; i < UsersListGlobal.length; i++) {
+                if (UsersListGlobal[i].email == userEmail && UsersListGlobal[i].password == userPass) {
+                    sessionStorage.setItem("UserLogin", `${userEmail}`);
+                    window.location.href = 'FlatPage.html';
+
+                }
+            }
+    
+            document.getElementById("UserLogin").innerHTML += "<p>User is not exist/passwoed is incorrect. please try again</p>";
+            return false;
+        }
+
+        function RegiUser() {
+            let u = {
+                firstName: $("#FirstNameTB").val(),
+                lastName: $("#LastNameTB").val(),
+                email: $("#EmailTB").val(),
+                password: $("#PasswordTB").val(),
+
+            };
+
+            api = server + "api/Users";
+
+            ajaxCall("POST", api, JSON.stringify(u), postSCB, postECB);
+            // GetFlats();
+        }
+        // success callback function
+        function postSCB(objectFromServer) {
+            console.log(objectFromServer);
+            document.getElementById("UserForm").style.display = "none";
+            document.getElementById("UserLogin").style.display = "";
+        }
+        // error callback function
+        function postECB(errorFromServer) {
+            console.log("email in use");
+            swal("email in use!", "Try again", "error");
+        }
+
+
+
+
+
+
+    </script>
+</head>
+
+<body>
+   
+    <div>
+        <form id="UserForm">
+            <h2>Register Here</h2>
+
+            <div class="form-group">
+                <label for="FirstNameTB"><span class="red-star"></span>First Name:</label>
+                <input type="text" class="form-control" id="FirstNameTB" placeholder="Enter First Name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="LastNameTB"><span class="red-star"></span>Last Name:</label>
+                <input type="text" class="form-control" id="LastNameTB" placeholder="Enter Last Name" required />
+            </div>
+            <div class="form-group">
+                <label for="EmailTB"><span class="red-star"></span>Email:</label>
+                <input type="text" class="form-control" id="EmailTB" placeholder="Enter Email" required />
+            </div>
+            <div class="form-group">
+                <label for="PasswordTB"><span class="red-star"></span>Password:</label>
+                <input type="text" class="form-control" id="PasswordTB" placeholder="Enter Password" required />
+            </div>
+
+            <input id="RegiBTN" type="submit" value="Register" />
+            <input id="RegiBTN" type="submit"  onclick="GoToLogin()" value="Login" />
+           
+        </form>
+    </div>
+
+    <div>
+        <form id="UserLogin">
+            <h2>Login Here</h2>
+
+            <div class="form-group">
+                <label for="LIEmailTB"><span class="red-star"></span>Email:</label>
+                <input type="text" class="form-control" id="LIEmailTB" placeholder="Enter Email" required />
+            </div>
+            <div class="form-group">
+                <label for="LIPasswordTB"><span class="red-star"></span>Password:</label>
+                <input type="text" class="form-control" id="LIPasswordTB" placeholder="Enter Password" required />
+            </div>
+
+            <input id="LoginBTN" type="submit" value="Login" />
+           
+        </form>
+
+    </div>
+</body>
+</html>

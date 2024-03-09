@@ -1,0 +1,11 @@
+C:\Users\Amit Ramati\Desktop\לימודים\עמית לימודים\שנה ד\צד שרת\Tar3\Tar3\Tar3\obj\Release\net6.0\PubTmp\Out\Tar3.exe
+C:\Users\Amit Ramati\Desktop\לימודים\עמית לימודים\שנה ד\צד שרת\Tar3\Tar3\Tar3\obj\Release\net6.0\PubTmp\Out\appsettings.Development.json
+C:\Users\Amit Ramati\Desktop\לימודים\עמית לימודים\שנה ד\צד שרת\Tar3\Tar3\Tar3\obj\Release\net6.0\PubTmp\Out\appsettings.json
+C:\Users\Amit Ramati\Desktop\לימודים\עמית לימודים\שנה ד\צד שרת\Tar3\Tar3\Tar3\obj\Release\net6.0\PubTmp\Out\Tar3.dll
+C:\Users\Amit Ramati\Desktop\לימודים\עמית לימודים\שנה ד\צד שרת\Tar3\Tar3\Tar3\obj\Release\net6.0\PubTmp\Out\Tar3.deps.json
+C:\Users\Amit Ramati\Desktop\לימודים\עמית לימודים\שנה ד\צד שרת\Tar3\Tar3\Tar3\obj\Release\net6.0\PubTmp\Out\Tar3.runtimeconfig.json
+C:\Users\Amit Ramati\Desktop\לימודים\עמית לימודים\שנה ד\צד שרת\Tar3\Tar3\Tar3\obj\Release\net6.0\PubTmp\Out\Tar3.pdb
+C:\Users\Amit Ramati\Desktop\לימודים\עמית לימודים\שנה ד\צד שרת\Tar3\Tar3\Tar3\obj\Release\net6.0\PubTmp\Out\Microsoft.OpenApi.dll
+C:\Users\Amit Ramati\Desktop\לימודים\עמית לימודים\שנה ד\צד שרת\Tar3\Tar3\Tar3\obj\Release\net6.0\PubTmp\Out\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\Amit Ramati\Desktop\לימודים\עמית לימודים\שנה ד\צד שרת\Tar3\Tar3\Tar3\obj\Release\net6.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\Amit Ramati\Desktop\לימודים\עמית לימודים\שנה ד\צד שרת\Tar3\Tar3\Tar3\obj\Release\net6.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerUI.dll

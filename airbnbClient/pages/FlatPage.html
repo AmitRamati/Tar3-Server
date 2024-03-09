@@ -1,0 +1,236 @@
+﻿
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+
+    <script src="../js/AjaxCalls.js"></script>
+    <!--<script src="../js/Flat.js"></script>-->
+    <link rel="stylesheet" href="../css/StyleSheet2.css">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            //if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+            //    let port = "7244";
+            //    server = 'https://localhost:' + port;
+
+            //}
+            //else {
+            //   server = "https://proj.ruppin.ac.il/cgroup67/test2/tar1/";
+            //}
+
+
+
+            let port = 7244;
+            server = `https://localhost:${port}/`;
+           /* GetFlats();*/
+            $("#FlatForm").submit(ValidForm);
+            $("#ULForm").submit(ValidForm2);
+            document.getElementById("UpdateUserForm").style.display = "none";
+           
+        });
+
+        
+
+        function ValidForm() {
+            SubmitFlat();
+            return false; // the return false will prevent the form from being submitted
+        }
+
+
+        function ValidForm2() {
+            return false;
+        }
+
+
+        function GetFlats() {
+            api = server + "api/Flats";
+            ajaxCall("GET", api, "", getSCB, getECB);
+        }
+        // success callback function
+        function getSCB(FlatList) {
+            console.log(FlatList);
+            str = "";
+            tmpID = 0;
+            for (var i = 0; i < FlatList.length; i++) {
+                str += `<div id="DivFlat"><p>Flat Id is: ${FlatList[i].id}</p><p>Flat city is: ${FlatList[i].city}</p><p>Flat address is: ${FlatList[i].address}</p></p><p>Flat price is: ${FlatList[i].price}</p></p><p>Flat number of rooms is: ${FlatList[i].numOfRooms}</p><button id="OrderVacationBTN" onclick="OrderVacation(${FlatList[i].id})">Order Vacation</button></div>`;
+                tmpID = FlatList[i].id;
+            }
+            document.getElementById("ph").innerHTML = str;
+
+        }
+        // error callback function
+        function getECB(errorFromServer) {
+            console.log(errorFromServer);
+        }
+        function SubmitFlat() {
+            if (sessionStorage.getItem("UserLogin") == "") {
+                document.getElementById("FlatForm").innerHTML += "<p>Please login to submit a flat</p>";
+            }
+            else {
+
+            
+            let f = {
+               
+                city: $("#CityTB").val(),
+                address: $("#AddressTB").val(),
+                numOfRooms: Number($("#numOfRoomsTB").val()),
+                price: Number($("#PriceTB").val())
+              
+            };
+
+            api = server + "api/Flats";
+
+            ajaxCall("POST", api, JSON.stringify(f), postSCB, postECB);
+                GetFlats();
+            }
+        }
+        // success callback function
+        function postSCB(objectFromServer) {
+            console.log(objectFromServer);
+        }
+        // error callback function
+        function postECB(errorFromServer) {
+            console.log(errorFromServer);
+        }
+        function OrderVacation(x) {
+            sessionStorage.setItem("FlatID", `${x}`);
+            window.location.href = 'VacationPage.html';
+        }
+
+        function UpdateDetails() {
+            document.getElementById("UpdateUserForm").style.display = "";
+            document.getElementById("FlatForm").style.display = "none";
+            document.getElementById("ph").style.display = "none";
+            $("#UpdateUserForm").submit(UpdatenNow);
+            return false;
+        }
+
+        function UpdatenNow() {
+            let u = {
+                firstName: $("#FirstNameTB").val(),
+                lastName: $("#LastNameTB").val(),
+                email: sessionStorage.getItem("UserLogin"),
+                password: $("#PasswordTB").val(),
+
+            };
+
+            api = server + "api/Users";
+
+            ajaxCall("PUT", api, JSON.stringify(u), putSCB, putECB);
+            return false;
+      
+        }
+
+        // success callback function
+        function putSCB(objectFromServer) {
+            console.log(objectFromServer);
+            document.getElementById("UpdateUserForm").style.display = "none";
+            document.getElementById("FlatForm").style.display = "";
+        }
+        // error callback function
+        function putECB(errorFromServer) {
+            console.log(errorFromServer);
+        }
+
+        function Logout() {
+            sessionStorage.removeItem("UserLogin");
+            window.location.href = 'User.html';
+            return false;
+        }
+
+    </script>
+
+
+
+</head>
+<body>
+    <div id="upper">
+        <div>
+            <form id="ULForm">
+
+                <input id="UpdateBTN" type="submit" onclick="UpdateDetails()" value="Update details" />
+                <input id="LogoutBTN" type="submit" onclick="Logout()" value="Logout" />
+                <!--<button id="GoLoginBTN" type="button" onclick="GoToLogin()">Login</button>-->
+            </form>
+        </div>
+
+        <div>
+            <form id="UpdateUserForm">
+                <h2>Update your details:</h2>
+
+                <div class="form-group">
+                    <label for="FirstNameTB"><span class="red-star"></span>First Name:</label>
+                    <input type="text" class="form-control" id="FirstNameTB" placeholder="Enter First Name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="LastNameTB"><span class="red-star"></span>Last Name:</label>
+                    <input type="text" class="form-control" id="LastNameTB" placeholder="Enter Last Name" required />
+                </div>
+                <!--<div class="form-group">
+                    <label for="EmailTB"><span class="red-star"></span>Email:</label>
+                    <input type="text" class="form-control" id="EmailTB" placeholder="Enter Email" required />
+                </div>-->
+                <div class="form-group">
+                    <label for="PasswordTB"><span class="red-star"></span>Password:</label>
+                    <input type="text" class="form-control" id="PasswordTB" placeholder="Enter Password" required />
+                </div>
+
+                <input id="UpdateNOWBTN" type="submit" value="Update" />
+
+            </form>
+
+        </div>
+        <form id="FlatForm">
+            <h2>Insert A new Flat</h2>
+
+            <!--<div class="form-group">
+                <label for="IdTB"><span class="red-star"></span>ID:</label>
+                <input type="number" class="form-control" id="IdTB" placeholder="Enter the Flat ID" required>
+            </div>-->
+
+            <div class="form-group">
+                <label for="CityTB"><span class="red-star"></span>City:</label>
+                <select class="form-control" id="CityTB" required>
+                    <option value="" disabled selected>Select a city</option>
+                    <option value="Tel-Aviv">Tel-Aviv</option>
+                    <option value="Eilat">Eilat</option>
+                    <option value="Jerusalem">Jerusalem</option>
+
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="AddressTB"><span class="red-star"></span>Address:</label>
+                <input type="text" class="form-control" id="AddressTB" placeholder="Enter Address" maxlength="25" required />
+            </div>
+            <div class="form-group">
+                <label for="PriceTB"><span class="red-star"></span>Price:</label>
+                <input type="number" class="form-control" id="PriceTB" placeholder="Enter the Price" required />
+            </div>
+            <div class="form-group">
+                <label for="numOfRoomsTB"><span class="red-star"></span>Number Of Rooms:</label>
+                <input type="number" class="form-control" id="numOfRoomsTB" min="1" max="8" placeholder="Enter Number of Rooms" required />
+            </div>
+            <!--<button id="SumbitBTN" onclick="SubmitFlat()">Submit Flat</button>-->
+            <input id="SumbitBTN" type="submit" value="Submit Flat" />
+        </form>
+
+    </div>
+
+
+
+
+    <div id="ph">
+        
+    </div>
+</body>
+</html>
